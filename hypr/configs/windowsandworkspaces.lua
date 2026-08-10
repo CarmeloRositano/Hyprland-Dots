@@ -35,6 +35,16 @@ hl.window_rule({
 -- })
 -- overlayLayerRule:set_enabled(false)
 
+hl.window_rule({
+    match = { class = "^Splashtop$" },
+		opacity = "1.0",
+})
+
+hl.window_rule({
+    match = { class = "^plex$" },
+    opacity = "1.0",
+})
+
 -- Hyprland-run windowrule
 hl.window_rule({
     name  = "move-hyprland-run",
@@ -81,16 +91,24 @@ hl.window_rule({
 
 -- Custom
 
--- Make all workspaces persistant
-for i = 1, 9 do
-    hl.workspace_rule({ workspace = i, persistent = true})
+-- DP-1: workspaces 1 and 3-10
+for i = 1, 10 do
+    if i ~= 2 then
+        hl.workspace_rule({
+            workspace = i,
+            monitor = "DP-3",
+            persistent = true,
+        })
+    end
 end
 
--- Set workspace 1 to main monitor
-hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persistent = true})
-
--- Set workspace 2 to always be 2nd monitor
-hl.workspace_rule({ workspace = "2", monitor = "HDMI-A-1", default = true, persistent = true})
+-- Workspace 2 is permanently assigned to the 2nd monitor
+hl.workspace_rule({
+    workspace = "2",
+    monitor = "HDMI-A-1",
+    default = true,
+    persistent = true
+})
 
 -- Autostart rules
 hl.window_rule({
