@@ -19,10 +19,15 @@
 
   "modules-center": [
 		"clock",
+		"custom/blank",
 		"custom/updates"
 	],
 
   "modules-right": [
+		"custom/wiremix",
+    "custom/blank",
+		"custom/network",
+    "custom/blank",
 		"custom/bluetooth",
 		"custom/blank",
 		"custom/btop",
@@ -47,24 +52,33 @@
   "clock": {
 		"interval": 1,
     "format": "[{:%I:%M:%S %p}]",
-    "format-alt": "[{:%e %B %A}]"
+    "format-alt": "[{:%e %B %A}]",
   },
 
 	"custom/btop": {
 		"format": "",
-  	"on-click": "kitty --class btop -e btop"
+  	"on-click": "kitty --class btop --override remember_window_size=no --override initial_window_width=180c --override initial_window_height=50c -e btop"
 	},
 
 	"custom/updates": {
-  	"exec": "sh -c 'n=$(checkupdates 2>/dev/null | wc -l); [ \"$n\" -gt 0 ] && echo \"●\" || echo \"\"'",
+  	"exec": "sh -c 'n=$(checkupdates 2>/dev/null | wc -l); [ \"$n\" -gt 0 ] && echo \"●\" || echo \" \"'",
   	"interval": 3600,
-  	"on-click": "kitty --class updates -e sudo pacman -Syu"
+  	"format": "{}",
+		"on-click": "kitty --class updates --title 'updates' --override remember_window_size=no --override initial_window_width=100c --override initial_window_height=30c -e ~/.config/waybar/pentagon-update.sh"
 	},
 
 	"custom/bluetooth": {
   	"format": "󰂯",
-  	"on-click": "kitty --class bluetui -e bluetui"
+  	"on-click": "kitty --class bluetui --override remember_window_size=no --override initial_window_width=100c --override initial_window_height=30c -e bluetui"
 	},
 
+	"custom/network": {
+		"format": "󰤨",
+		"on-click": "kitty --class impala --override remember_window_size=no --override initial_window_width=100c --override initial_window_height=30c -e impala"
+	},
+
+	"custom/wiremix": {
+    "format": "󰕾",
+    "on-click": "kitty --class wiremix --override remember_window_size=no --override initial_window_width=900 --override initial_window_height=600 wiremix"
+	},
 }
-?

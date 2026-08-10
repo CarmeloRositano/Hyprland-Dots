@@ -8,8 +8,8 @@ hl.config({
 
         follow_mouse = 1,
 
-        sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
+        sensitivity = -0.5, -- -1.0 - 1.0, 0 means no modification.
 	
-	accel_profile = flat
+				accel_profile = flat
     },
 })

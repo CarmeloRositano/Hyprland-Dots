@@ -1,7 +1,7 @@
 local alias = {
     terminal    = "kitty",
-    fileManager = "dolphin",
-    menu        = "hyprlauncher",
+    fileManager = "nautilus",
+    menu        = "wofi --show drun",
     browser     = "flatpak run app.zen_browser.zen",
 }
 

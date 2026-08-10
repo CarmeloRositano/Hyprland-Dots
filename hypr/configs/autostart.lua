@@ -1,17 +1,19 @@
 hl.on("hyprland.start", function ()
     local defaults = require("configs.defaults")
 
-    -- Start Locked
-    hl.exec_cmd("hyprlock")
-
     -- Main
-    hl.exec_cmd(defaults.terminal)
+    hl.exec_cmd(defaults.terminal, { workspace = "1"})
+		hl.exec_cmd(defaults.browser, { workspace = "1"})
+    hl.exec_cmd("kitty -e btop", { workspace = "2 silent" })
+		hl.exec_cmd("flatpak run com.spotify.Client", { workspace = "8 silent"})
+		hl.exec_cmd("discord", { workspace = "9 silent"})
+		hl.exec_cmd("steam", { workspace = "10 silent"})
 
     -- Background Daemons
+		hl.exec_cmd("dunst")
     hl.exec_cmd("hypridle")
+		hl.exec_cmd("~/.config/waybar/waybar-autohide")
     hl.exec_cmd("waybar")
     hl.exec_cmd("hyprpaper")
-
---   hl.exec_cmd("nm-applet")
---   hl.exec_cmd("waybar & hyprpaper & firefox")
+		hl.exec_cmd("walker --gapplication-service")
 end)

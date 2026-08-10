@@ -12,6 +12,7 @@ function M.setup(defaults)
     hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(defaults.browser))
     hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(defaults.menu))
     hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
+		hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("waypaper"))
 
     -- Move focus with mainMod + arrow keys
     hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))

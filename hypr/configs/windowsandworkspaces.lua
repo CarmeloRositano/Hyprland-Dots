@@ -45,22 +45,36 @@ hl.window_rule({
 })
 
 hl.window_rule({
-		name = "btop",
+		name  = "btop",
 		match = { class = "btop"},
 
 		float = true,
 })
 
 hl.window_rule({
-    name = "updates",
+    name  = "updates",
     match = { class = "updates"},
 
     float = true,
 })
 
 hl.window_rule({
+		name  = "impala",
+		match = { class = "impala" },
+
+		float = true,
+})
+
+hl.window_rule({
     name = "bluetui",
     match = { class = "bluetui"},
+
+    float = true,
+})
+
+hl.window_rule({
+    name = "wiremix",
+    match = { class = "wiremix"},
 
     float = true,
 })
@@ -73,7 +87,23 @@ for i = 1, 9 do
 end
 
 -- Set workspace 1 to main monitor
-hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true})
+hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persistent = true})
 
 -- Set workspace 2 to always be 2nd monitor
-hl.workspace_rule({ workspace = "2", monitor = "HDMI-A-1", default = true})
+hl.workspace_rule({ workspace = "2", monitor = "HDMI-A-1", default = true, persistent = true})
+
+-- Autostart rules
+hl.window_rule({
+		match = { class = "^spotify$" },
+		workspace = "8 silent",
+})
+
+hl.window_rule({
+    match = { class = "^discord$" },
+    workspace = "9 silent",
+})
+
+hl.window_rule({
+    match = { class = "^steam$" },
+    workspace = "10 silent",
+})
