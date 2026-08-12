@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=OpenDeck
+Comment=Use stream controllers
+Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=opendeck me.amankhanna.opendeck
+Icon=me.amankhanna.opendeck
+Terminal=false
+Categories=Office;
+X-Flatpak-RenamedFrom=opendeck.desktop;
+X-Flatpak=me.amankhanna.opendeck
