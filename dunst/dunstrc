@@ -1,2 +1,0 @@
-[global]
-    mouse_left_click = do_action, close_current
