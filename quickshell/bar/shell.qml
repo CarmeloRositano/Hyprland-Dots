@@ -12,6 +12,10 @@ Scope {
         id: launcher
     }
 
+    Power {
+        id: power
+    }
+
     IpcHandler {
         function toggle() {
             launcher.visible = !launcher.visible;

@@ -162,7 +162,7 @@ Scope {
                 BarButton {
                     text: ""
                     fontSize: 18
-                    onClicked: Quickshell.execDetached(["sh", "-c", "$HOME/.config/quickshell/power-menu.sh"])
+                    onClicked: Quickshell.execDetached(["quickshell", "ipc", "-c", "bar", "call", "power", "toggle"])
                 }
 
             }
