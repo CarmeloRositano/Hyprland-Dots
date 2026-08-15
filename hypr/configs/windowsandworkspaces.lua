@@ -125,3 +125,11 @@ hl.window_rule({
     match = { class = "^steam$" },
     workspace = "10 silent",
 })
+
+hl.window_rule({
+    match = { title = "^qs-launcher$" },
+    float = true,
+    center = true,
+    size = "600 500",
+		stay_focused = true,
+})
