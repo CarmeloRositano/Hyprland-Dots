@@ -1,5 +1,10 @@
 import Quickshell
 
 Scope {
-    Bar {}
+    Bar {
+    }
+
+    Notifications {
+    }
+
 }
