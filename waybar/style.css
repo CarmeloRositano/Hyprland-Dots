@@ -29,7 +29,7 @@ window#waybar {
 }
 
 .modules-right {
-  margin-right: 8px;
+  margin-right: 5px;
 }
 
 
@@ -59,4 +59,13 @@ window#waybar {
 	padding-bottom: 3px;
 }
 
+#custom-power {
+		padding-left: 10px;
+		padding-right: 10px;
+    border-radius: 10px;
+		font-size: 18px;
+}
 
+#custom-music {
+		padding-left: 50px;
+}

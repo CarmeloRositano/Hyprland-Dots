@@ -15,7 +15,9 @@
     "custom/blank",
     "custom/workspaces",
     "custom/blank",
-  ],
+		"custom/music",
+		"custom/blank" 
+ ],
 
   "modules-center": [
 		"clock",
@@ -31,6 +33,7 @@
 		"custom/bluetooth",
 		"custom/blank",
 		"custom/btop",
+		"custom/power",
   ],
 
   // ======================================================
@@ -41,9 +44,7 @@
     "exec": "~/.config/waybar/workspaces.sh",
     "interval": 0,
     "return-type": "json",
-    "on-scroll-up": "~/.config/waybar/workspaces.sh up",
-    "on-scroll-down": "~/.config/waybar/workspaces.sh down"
-  },
+  },	
 
   "custom/blank": {
     "format": " "
@@ -55,13 +56,19 @@
     "format-alt": "[{:%e %B %A}]",
   },
 
+	"custom/music": {
+    "format": "{}",
+    "return-type": "json",
+    "exec": "waybar-module-music",
+  },
+
 	"custom/btop": {
 		"format": "",
   	"on-click": "kitty --class btop --override remember_window_size=no --override initial_window_width=180c --override initial_window_height=50c -e btop"
 	},
 
 	"custom/updates": {
-  	"exec": "sh -c 'n=$(checkupdates 2>/dev/null | wc -l); [ \"$n\" -gt 0 ] && echo \"●\" || echo \" \"'",
+    "exec": "sh -c 'n=$(checkupdates 2>/dev/null | wc -l); [ \"$n\" -gt 0 ] && echo \"●\" || echo \" \"'",
   	"interval": 3600,
   	"format": "{}",
 		"on-click": "kitty --class updates --title 'updates' --override remember_window_size=no --override initial_window_width=100c --override initial_window_height=30c -e ~/.config/waybar/pentagon-update.sh"
@@ -80,5 +87,11 @@
 	"custom/wiremix": {
     "format": "󰕾",
     "on-click": "kitty --class wiremix --override remember_window_size=no --override initial_window_width=900 --override initial_window_height=600 wiremix"
+	},
+
+	"custom/power": {
+    "format": "",
+    "tooltip": false,
+    "on-click": "~/.config/waybar/power-menu.sh"
 	},
 }

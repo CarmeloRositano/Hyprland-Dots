@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Exec=flatpak run --command=gsr-ui-cli com.dec05eba.gpu_screen_recorder
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=GPU Screen Recorder Service
