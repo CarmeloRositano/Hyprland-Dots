@@ -1,0 +1,213 @@
+{
+  "id": "amoledBlack",
+  "name": "Atomic Purple AMOLED",
+  "version": "1.0.0",
+  "author": "acup",
+  "description": "Pure AMOLED black with Game Boy Atomic Purple accents",
+  "dark": {},
+  "light": {},
+  "variants": {
+    "type": "multi",
+    "defaults": {
+      "dark": {
+        "accent": "purple",
+        "flavor": "black"
+      },
+      "light": {
+        "accent": "purple",
+        "flavor": "black-light"
+      }
+    },
+    "flavors": [
+      {
+        "id": "black",
+        "name": "black",
+        "dark": {
+          "primaryText": "#000000",
+          "primaryContainer": "#000000",
+          "secondary": "#8B7895",
+          "surface": "#000000",
+          "surfaceText": "#EDE7F0",
+          "surfaceVariant": "#000000",
+          "surfaceVariantText": "#F5EFF8",
+          "surfaceTint": "#8050A8",
+          "background": "#000000",
+          "backgroundText": "#FFFFFF",
+          "outline": "#493653",
+          "surfaceContainer": "#000000",
+          "surfaceContainerHigh": "#000000",
+          "error": "#D94A52",
+          "warning": "#C9A85A",
+          "info": "#A985C4"
+        },
+        "light": {}
+      },
+      {
+        "id": "black-light",
+        "name": "black",
+        "dark": {},
+        "light": {
+          "primaryText": "#000000",
+          "primaryContainer": "#000000",
+          "secondary": "#8B7895",
+          "surface": "#000000",
+          "surfaceText": "#EDE7F0",
+          "surfaceVariant": "#000000",
+          "surfaceVariantText": "#F5EFF8",
+          "surfaceTint": "#8050A8",
+          "background": "#000000",
+          "backgroundText": "#FFFFFF",
+          "outline": "#493653",
+          "surfaceContainer": "#000000",
+          "surfaceContainerHigh": "#000000",
+          "error": "#D94A52",
+          "warning": "#C9A85A",
+          "info": "#A985C4"
+        }
+      }
+    ],
+    "accents": [
+      {
+        "black": {
+          "primary": "#FFFFFF"
+        },
+        "black-light": {
+          "primary": "#FFFFFF"
+        },
+        "id": "white",
+        "name": "white"
+      },
+      {
+        "black": {
+          "primary": "#D94A52"
+        },
+        "black-light": {
+          "primary": "#D94A52"
+        },
+        "id": "red",
+        "name": "red"
+      },
+      {
+        "black": {
+          "primary": "#80505C"
+        },
+        "black-light": {
+          "primary": "#80505C"
+        },
+        "id": "maroon",
+        "name": "maroon"
+      },
+      {
+        "black": {
+          "primary": "#6FA66A"
+        },
+        "black-light": {
+          "primary": "#6FA66A"
+        },
+        "id": "green",
+        "name": "green"
+      },
+      {
+        "black": {
+          "primary": "#507A55"
+        },
+        "black-light": {
+          "primary": "#507A55"
+        },
+        "id": "dark-green",
+        "name": "dark green"
+      },
+      {
+        "black": {
+          "primary": "#A6B85C"
+        },
+        "black-light": {
+          "primary": "#A6B85C"
+        },
+        "id": "greenyellow",
+        "name": "greenyellow"
+      },
+      {
+        "black": {
+          "primary": "#62A681"
+        },
+        "black-light": {
+          "primary": "#62A681"
+        },
+        "id": "coral",
+        "name": "coral"
+      },
+      {
+        "black": {
+          "primary": "#647FA8"
+        },
+        "black-light": {
+          "primary": "#647FA8"
+        },
+        "id": "blue",
+        "name": "blue"
+      },
+      {
+        "black": {
+          "primary": "#65A6A0"
+        },
+        "black-light": {
+          "primary": "#65A6A0"
+        },
+        "id": "turquoise",
+        "name": "turquoise"
+      },
+      {
+        "black": {
+          "primary": "#8050A8"
+        },
+        "black-light": {
+          "primary": "#8050A8"
+        },
+        "id": "purple",
+        "name": "atomic purple"
+      },
+      {
+        "black": {
+          "primary": "#A65C8E"
+        },
+        "black-light": {
+          "primary": "#A65C8E"
+        },
+        "id": "pink",
+        "name": "pink"
+      },
+      {
+        "black": {
+          "primary": "#B0A05A"
+        },
+        "black-light": {
+          "primary": "#B0A05A"
+        },
+        "id": "yellow",
+        "name": "yellow"
+      },
+      {
+        "black": {
+          "primary": "#A56B4A"
+        },
+        "black-light": {
+          "primary": "#A56B4A"
+        },
+        "id": "orange",
+        "name": "orange"
+      },
+      {
+        "black": {
+          "primary": "#B27A4D"
+        },
+        "black-light": {
+          "primary": "#B27A4D"
+        },
+        "id": "light-orange",
+        "name": "light orange"
+      }
+    ]
+  },
+  "sourceDir": "amoled-black-theme"
+}

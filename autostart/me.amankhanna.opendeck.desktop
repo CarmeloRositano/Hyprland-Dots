@@ -2,7 +2,7 @@
 Type=Application
 Name=OpenDeck
 Comment=Use stream controllers
-Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=opendeck me.amankhanna.opendeck
+Exec=/usr/bin/flatpak run --branch=stable --arch=x86_64 --command=opendeck me.amankhanna.opendeck --hide
 Icon=me.amankhanna.opendeck
 Terminal=false
 Categories=Office;
