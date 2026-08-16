@@ -1,0 +1,71 @@
+/* ===================================================== */
+/* GLOBAL                                                */
+/* ===================================================== */
+
+@define-color background #000;
+
+window#waybar {
+	background-color: #000;
+}
+
+* {
+  color: @foreground;
+  
+  border: none;
+  border-radius: 0;
+  border: 0px solid alpha(@foreground, 0.6);
+
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 12px;
+}
+
+
+/* ===================================================== */
+/* LAYOUT SPACING                                        */
+/* ===================================================== */
+
+.modules-left {
+  margin-left: 8px;
+}
+
+.modules-right {
+  margin-right: 5px;
+}
+
+
+/* ===================================================== */
+/* MODULES                                               */
+/* ===================================================== */
+
+#custom-btop {
+    font-size: 20px;
+		padding-right: 10px;
+}
+
+#custom-wiremix,
+#custom-network {
+		font-size: 24px;
+		padding-right: 10px;
+}
+
+#custom-bluetooth {
+		font-size: 18px;
+		padding-right: 10px
+}
+
+#custom-updates {
+	color: #ff0000;
+  font-size: 16px;
+	padding-bottom: 3px;
+}
+
+#custom-power {
+		padding-left: 10px;
+		padding-right: 10px;
+    border-radius: 10px;
+		font-size: 18px;
+}
+
+#custom-music {
+		padding-left: 50px;
+}

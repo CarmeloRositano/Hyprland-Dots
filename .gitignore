@@ -1,0 +1,20 @@
+# Ignore Everything
+*
+
+# Include
+!hypr/
+!kitty/
+!nautilus/
+!waybar/
+!wofi/
+!waypaper/
+
+!hypr/**
+!kitty/**
+!nautilus/**
+!waybar/**
+!wofi/**
+!waypaper/**
+
+# Keep gitignore files
+!.gitignore
