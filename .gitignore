@@ -8,6 +8,7 @@
 !waybar/
 !wofi/
 !waypaper/
+!quickshell/
 
 !hypr/**
 !kitty/**
@@ -15,6 +16,7 @@
 !waybar/**
 !wofi/**
 !waypaper/**
+!quickshell/**
 
 # Keep gitignore files
 !.gitignore
