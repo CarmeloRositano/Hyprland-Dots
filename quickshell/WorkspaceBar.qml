@@ -4,7 +4,8 @@ import Quickshell.Hyprland
 
 RowLayout {
     id: root
-    spacing: 10
+    spacing: 6
+    x: 20
 
     // Expose properties for easy customisation when importing
     property int maxWorkspaces: 10

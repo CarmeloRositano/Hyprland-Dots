@@ -34,6 +34,7 @@ function M.setup(defaults)
 
     hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 
-end
+    -- Screenshot
+    hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp -d)" - | tee ~/Pictures/Screenshots/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png | wl-copy'))end
 
 return M

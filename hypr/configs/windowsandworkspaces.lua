@@ -27,17 +27,9 @@ hl.window_rule({
     no_focus = true,
 })
 
--- Layer rules also return a handle.
--- local overlayLayerRule = hl.layer_rule({
---     name  = "no-anim-overlay",
---     match = { namespace = "^my-overlay$" },
---     no_anim = true,
--- })
--- overlayLayerRule:set_enabled(false)
-
 hl.window_rule({
     match = { class = "^Splashtop$" },
-		opacity = "1.0",
+	opacity = "1.0",
 })
 
 hl.window_rule({
@@ -53,43 +45,6 @@ hl.window_rule({
     move  = "20 monitor_h-120",
     float = true,
 })
-
-hl.window_rule({
-		name  = "btop",
-		match = { class = "btop"},
-
-		float = true,
-})
-
-hl.window_rule({
-    name  = "updates",
-    match = { class = "updates"},
-
-    float = true,
-})
-
-hl.window_rule({
-		name  = "impala",
-		match = { class = "impala" },
-
-		float = true,
-})
-
-hl.window_rule({
-    name = "bluetui",
-    match = { class = "bluetui"},
-
-    float = true,
-})
-
-hl.window_rule({
-    name = "wiremix",
-    match = { class = "wiremix"},
-
-    float = true,
-})
-
--- Custom
 
 -- DP-1: workspaces 1 and 3-10
 for i = 1, 10 do
@@ -112,8 +67,8 @@ hl.workspace_rule({
 
 -- Autostart rules
 hl.window_rule({
-		match = { class = "^spotify$" },
-		workspace = "8 silent",
+	match = { class = "^spotify$" },
+	workspace = "8 silent",
 })
 
 hl.window_rule({
