@@ -29,12 +29,18 @@ hl.window_rule({
 
 hl.window_rule({
     match = { class = "^Splashtop$" },
-	opacity = "1.0",
+	opacity = "1.0 override",
 })
 
 hl.window_rule({
-    match = { class = "^plex$" },
-    opacity = "1.0",
+    match = { class = "Plex" },
+    opacity = "1.0 override",
+})
+
+hl.window_rule({
+    match = { title = "Picture-in-Picture" },
+    opacity = "1.0 override",
+    float = true,
 })
 
 -- Hyprland-run windowrule

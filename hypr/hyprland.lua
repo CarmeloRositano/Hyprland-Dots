@@ -81,3 +81,5 @@ keybinds.setup()
 --------------------------------
 
 require("configs.windowsandworkspaces")
+
+dofile("/home/carmelo/.cache/qswitch/qswitch.lua")

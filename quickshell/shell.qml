@@ -1,5 +1,9 @@
 import Quickshell
 
 Scope {
-    Bar {}
+    Bar {
+    }
+
+    Launcher {
+    }
 }
