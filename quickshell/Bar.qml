@@ -1,7 +1,5 @@
 import Quickshell
-import Quickshell.Io
 import QtQuick
-import Quickshell.Hyprland
 
 Scope {
     Variants {
@@ -12,35 +10,32 @@ Scope {
             required property var modelData
             screen: modelData
 
-            implicitHeight: barWindow.barVisible ? 45 : 1
-            implicitWidth: 300
-            color: "transparent"
-            exclusionMode: ExclusionMode.Ignore
-            aboveWindows: true
-
             anchors {
                 top: true
+                left: true
+                right: true
             }
 
-            margins {
-                left: (screen.width - 300) / 2
-            }
+            readonly property int barMax: 30
+            readonly property int barMin: 1
+
+            implicitHeight: barWindow.barVisible ? barWindow.barMax : barWindow.barMin
+            color: "transparent"
+            exclusionMode: ExclusionMode.Ignore
 
             property bool barVisible: false
-            property bool expandClock: false
-            property bool expandWorkspace: false
-            property bool expandPowerbutton: false
+            property bool expand: false
 
             // Check if anything above or in the bar is hovered
             HoverHandler {
                 id: barHover
-                enabled: barWindow.expandClock
+                enabled: barWindow.expand
 
                 onHoveredChanged: {
                     if (hovered)
-                        hideTimer.stop()
+                        hideTimer.stop();
                     else
-                        hideTimer.restart()
+                        hideTimer.restart();
                 }
             }
 
@@ -50,18 +45,18 @@ Scope {
                     top: parent.top
                     horizontalCenter: parent.horizontalCenter
                 }
-                width: 300
+                width: parent.width
                 height: 1
                 hoverEnabled: true
 
                 onEntered: {
-                    barWindow.barVisible = true
-                    barWindow.expandClock = true
-                    hideTimer.stop()
+                    barWindow.barVisible = true;
+                    barWindow.expand = true;
+                    hideTimer.stop();
                 }
 
                 onExited: {
-                    hideTimer.restart()
+                    hideTimer.restart();
                 }
             }
 
@@ -73,36 +68,36 @@ Scope {
 
                 onTriggered: {
                     if (!barHover.hovered)
-                        barWindow.expandClock = false
+                        barWindow.expand = false;
                 }
             }
 
-            // Bar
             Rectangle {
                 id: contentRoot
-                anchors.horizontalCenter: parent.horizontalCenter
-                y: (parent.height - height) / 2
-                
-                width: 284
-                color: "#000000"
-                radius: 20
-                clip: true
+
+                anchors {
+                    top: parent.top
+                    left: parent.left
+                    right: parent.right
+                }
+
+                color: "transparent"
 
                 states: [
                     State {
-                        name: "expandClock"
-                        when: barWindow.expandClock
+                        name: "expand"
+                        when: barWindow.expand
 
                         PropertyChanges {
                             target: contentRoot
-                            width: 284
-                            height: 40
+                            width: parent.width
+                            height: barWindow.barMax
                             opacity: 1
                         }
                     },
                     State {
                         name: "collapsed"
-                        when: !barWindow.expandClock
+                        when: !barWindow.expand
 
                         PropertyChanges {
                             target: contentRoot
@@ -116,7 +111,7 @@ Scope {
                 transitions: [
                     Transition {
                         from: "collapsed"
-                        to: "expandClock"
+                        to: "expand"
 
                         ParallelAnimation {
                             NumberAnimation {
@@ -142,9 +137,8 @@ Scope {
                             }
                         }
                     },
-
                     Transition {
-                        from: "expandClock"
+                        from: "expand"
                         to: "collapsed"
 
                         SequentialAnimation {
@@ -178,26 +172,51 @@ Scope {
                     }
                 ]
 
-                // Left
-                WorkspaceBar {
-                    anchors.verticalCenter: parent.verticalCenter
-                    maxWorkspaces: 10
-                    visible: barWindow.expandWorkspace
-                }
+                Rectangle {
+                    id: barContent
 
-                // Middle
-                ClockWidget {
-                    anchors.centerIn: parent
-                }
-
-                // Right
-                PowerButton {
-                    id: powerButton
                     anchors {
+                        top: parent.top
+                        left: parent.left
                         right: parent.right
-                        verticalCenter: parent.verticalCenter
+                        topMargin: 5
+                        leftMargin: 10
+                        rightMargin: 10
                     }
-                    visible: barWindow.expandPowerbutton
+
+                    height: parent.height - barContent.anchors.topMargin
+                    color: '#0e0e0e'
+
+                    // Left
+                    WorkspaceBar {
+                        anchors.verticalCenter: parent.verticalCenter
+                        maxWorkspaces: 10
+                        visible: barWindow.expandWorkspace
+                    }
+
+                    // Middle
+                    ClockWidget {
+                        anchors.centerIn: parent
+                    }
+
+                    // Right
+                    PowerButton {
+                        id: powerButton
+                        anchors {
+                            right: parent.right
+                            verticalCenter: parent.verticalCenter
+                        }
+                        visible: barWindow.expandPowerbutton
+                    }
+
+                    // StartMenu {
+                    //     id: startMenu
+                    //     anchors {
+                    //         right: parent.right
+                    //         verticalCenter: parent.verticalCenter
+                    //     }
+                    //     visible: barWindow.expandPowerbutton
+                    // }
                 }
             }
         }

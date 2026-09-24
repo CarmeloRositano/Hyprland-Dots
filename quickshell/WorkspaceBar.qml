@@ -28,12 +28,14 @@ RowLayout {
                 font.family: "JetBrainsMono Nerd Font"
                 text: (parent.isFocused ? "[" : " ") + parent.wsId + (parent.isFocused ? "]" : " ")
                 color: '#ffffff'
+                font.pixelSize: 15
             }
 
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    Hyprland.dispatch(`hl.dsp.focus({ workspace = ${parent.wsId} })`)                }
+                    Hyprland.dispatch(`hl.dsp.focus({ workspace = ${parent.wsId} })`)
+                }
             }
         }
     }

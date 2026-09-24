@@ -17,7 +17,7 @@ Item {
 
         text: "⏻"
         color: "white"
-        font.pixelSize: 12
+        font.pixelSize: 15
     }
 
     MouseArea {

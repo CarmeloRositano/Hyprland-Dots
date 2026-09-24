@@ -82,4 +82,4 @@ keybinds.setup()
 
 require("configs.windowsandworkspaces")
 
-dofile("/home/carmelo/.cache/qswitch/qswitch.lua")
+env = QT_QPA_PLATFORMTHEME,qt6ct

@@ -1,6 +1,10 @@
 hl.on("hyprland.start", function()
 	local defaults = require("configs.defaults")
 
+	-- Style Config
+	env = QT_QPA_PLATFORMTHEME,qt6ct
+	hl.exec_cmd("dbus-update-activation-environment --systemd QT_QPA_PLATFORMTHEME=qt6ct")
+
 	-- Main
 	hl.exec_cmd(defaults.terminal, { workspace = "1" })
 	hl.exec_cmd(defaults.browser, { workspace = "1" })
@@ -8,13 +12,14 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("flatpak run .github.wiiznokes.fan-control", { workspace = "6 silent" })
 	hl.exec_cmd("flatpak run com.spotify.Client", { workspace = "8 silent" })
 	hl.exec_cmd("flatpak run com.discordapp.Discord", { workspace = "9 silent" })
-	hl.exec_cmd("steam", { workspace = "10 silent" })
+	hl.exec_cmd("xrandr --output DP-3 --primary && steam", { workspace = "10 silent" })
 
 	-- Background Daemons
 	hl.exec_cmd("dunst")
 	hl.exec_cmd("hypridle")
 	hl.exec_cmd("quickshell")
-	hl.exec_cmd("~/.config/waybarr/waybar-autohide")
+	-- hl.exec_cmd("~/.config/waybarr/waybar-autohide")
+	hl.exec_cmd("gsr-ui launch-hide-announce")
 	hl.exec_cmd("hyprpaper")
 	hl.exec_cmd("walker --gapplication-service")
 	hl.exec_cmd("sleep 10 && flatpak run me.amankhanna.opendeck --hide")
