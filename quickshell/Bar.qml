@@ -67,8 +67,9 @@ Scope {
                 repeat: false
 
                 onTriggered: {
-                    if (!barHover.hovered)
+                    if (!barHover.hovered && !startMenu.visible && !networkMenu.visible) {
                         barWindow.expand = false;
+                    }
                 }
             }
 
@@ -189,9 +190,14 @@ Scope {
 
                     // Left
                     WorkspaceBar {
-                        anchors.verticalCenter: parent.verticalCenter
+                        anchors {
+                            left: parent.left
+                            verticalCenter: parent.verticalCenter
+                            leftMargin: 10
+                        }
+
                         maxWorkspaces: 10
-                        visible: barWindow.expandWorkspace
+                        z: 100
                     }
 
                     // Middle
@@ -200,23 +206,53 @@ Scope {
                     }
 
                     // Right
-                    PowerButton {
-                        id: powerButton
+                    Network {
+                        id: networkWidget
+
+                        anchors {
+                            right: startButton.left
+                            verticalCenter: parent.verticalCenter
+                            rightMargin: 10
+                        }
+
+                        MouseArea {
+                            id: networkMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+
+                            onClicked: networkMenu.toggle()
+                        }
+                    }
+
+                    NetworkMenu {
+                        id: networkMenu
+
+                        wifiDevice: networkWidget.wifiDevice
+
+                        onVisibleChanged: {
+                            if (!visible)
+                                hideTimer.restart();
+                        }
+                    }
+
+                    Start {
+                        id: startButton
+
                         anchors {
                             right: parent.right
                             verticalCenter: parent.verticalCenter
                         }
-                        visible: barWindow.expandPowerbutton
                     }
 
-                    // StartMenu {
-                    //     id: startMenu
-                    //     anchors {
-                    //         right: parent.right
-                    //         verticalCenter: parent.verticalCenter
-                    //     }
-                    //     visible: barWindow.expandPowerbutton
-                    // }
+                    StartMenu {
+                        id: startMenu
+
+                        onVisibleChanged: {
+                            if (!visible)
+                                hideTimer.restart();
+                        }
+                    }
                 }
             }
         }

@@ -9,7 +9,7 @@ Scope {
         target: "launcher"
 
         function toggle(): void {
-            launcherVisible = !launcherVisible
+            launcherVisible = !launcherVisible;
         }
     }
 
@@ -39,7 +39,7 @@ Scope {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 500
                 height: 40
-                y: (parent.height - height) / 2                
+                y: (parent.height - height) / 2
                 color: "#000000"
                 radius: 20
                 clip: true
@@ -47,7 +47,6 @@ Scope {
                 states: [
                     State {
                         name: "expandClock"
-                        when: barWindow.expandClock
 
                         PropertyChanges {
                             target: contentRoot
@@ -58,7 +57,6 @@ Scope {
                     },
                     State {
                         name: "collapsed"
-                        when: !barWindow.expandClock
 
                         PropertyChanges {
                             target: contentRoot
@@ -98,7 +96,6 @@ Scope {
                             }
                         }
                     },
-
                     Transition {
                         from: "expandClock"
                         to: "collapsed"
@@ -133,7 +130,6 @@ Scope {
                         }
                     }
                 ]
-
             }
         }
     }
