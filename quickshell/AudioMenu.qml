@@ -126,10 +126,17 @@ PanelWindow {
         inputDevices = inputs;
     }
 
+    property var _volumeDebounce: null
+
     function setDeviceVolume(deviceId, percentage) {
-        var value = percentage / 100;
-        volumeProcess.command = ["wpctl", "set-volume", deviceId.toString(), value.toFixed(2)];
-        volumeProcess.running = true;
+        AudioState.volume = percentage;
+        if (_volumeDebounce)
+            clearTimeout(_volumeDebounce);
+        _volumeDebounce = setTimeout(() => {
+            var value = percentage / 100;
+            volumeProcess.command = ["wpctl", "set-volume", deviceId.toString(), value.toFixed(2)];
+            volumeProcess.running = true;
+        }, 80);
     }
 
     // Click anywhere outside the menu to close it
@@ -146,9 +153,12 @@ PanelWindow {
     Process {
         id: statusProcess
         command: ["wpctl", "status"]
-
         stdout: StdioCollector {
-            onStreamFinished: root.parseStatus(text)
+            onStreamFinished: {
+                if (root.sliderActive)
+                    return;   // discard stale result
+                root.parseStatus(text);
+            }
         }
     }
 
@@ -353,8 +363,8 @@ PanelWindow {
                                 }
 
                                 onMoved: {
-                                    root.setDeviceVolume(modelData.id, value);
-                                    modelData.volume = value;
+                                    AudioState.volume = Math.round(value);   // ← instant update in Audio.qml
+                                    root.setDeviceVolume(deviceRow.modelData.id, value);
                                 }
 
                                 background: Rectangle {
