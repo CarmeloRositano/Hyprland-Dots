@@ -67,7 +67,7 @@ Scope {
                 repeat: false
 
                 onTriggered: {
-                    if (!barHover.hovered && !startMenu.visible && !networkMenu.visible) {
+                    if (!barHover.hovered && !startMenu.visible && !networkMenu.visible && !audioMenu.visible) {
                         barWindow.expand = false;
                     }
                 }
@@ -229,6 +229,33 @@ Scope {
                         id: networkMenu
 
                         wifiDevice: networkWidget.wifiDevice
+
+                        onVisibleChanged: {
+                            if (!visible)
+                                hideTimer.restart();
+                        }
+                    }
+
+                    Audio {
+                        id: audioWidget
+
+                        anchors {
+                            right: networkWidget.left
+                            verticalCenter: parent.verticalCenter
+                            rightMargin: 10
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+
+                            onClicked: audioMenu.visible = !audioMenu.visible
+                        }
+                    }
+
+                    AudioMenu {
+                        id: audioMenu
 
                         onVisibleChanged: {
                             if (!visible)

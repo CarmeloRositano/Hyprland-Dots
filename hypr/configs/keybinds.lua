@@ -13,7 +13,9 @@ function M.setup(defaults)
     hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(defaults.menu))
     -- hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("qs ipc call launcher toggle"))
     hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
-		hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("waypaper"))
+    -- hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("waypaper"))
+    hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
+    hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ action = "toggle" }))
 
     -- Move focus with mainMod + arrow keys
     hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -33,9 +35,6 @@ function M.setup(defaults)
     hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
     hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
-    hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
-
     -- Screenshot
-    hl.bind("Print", hl.dsp.exec_cmd('grim -g "$(slurp -d)" - | tee ~/Pictures/Screenshots/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png | wl-copy'))end
-
+    hl.bind("Home", hl.dsp.exec_cmd('grimblast --freeze copysave area ~/Pictures/Screenshots/screenshot-$(date +%Y-%m-%d_%H-%M-%S).png'))end
 return M
