@@ -210,7 +210,7 @@ Scope {
                         id: networkWidget
 
                         anchors {
-                            right: startButton.left
+                            right: parent.right
                             verticalCenter: parent.verticalCenter
                             rightMargin: 10
                         }
@@ -260,15 +260,6 @@ Scope {
                         onVisibleChanged: {
                             if (!visible)
                                 hideTimer.restart();
-                        }
-                    }
-
-                    Start {
-                        id: startButton
-
-                        anchors {
-                            right: parent.right
-                            verticalCenter: parent.verticalCenter
                         }
                     }
 

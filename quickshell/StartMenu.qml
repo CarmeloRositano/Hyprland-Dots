@@ -11,62 +11,39 @@ PanelWindow {
     visible: false
     focusable: true
 
+    Shortcut {
+        sequence: "Escape"
+        context: Qt.WindowShortcut
+
+        onActivated: {
+            root.visible = false;
+        }
+    }
+
+    IpcHandler {
+        target: "startmenu"
+        function toggle() {
+            root.toggle();
+        }
+        function close() {
+            root.visible = false;
+        }
+    }
+
     HyprlandFocusGrab {
         windows: [root]
         active: root.visible
-
         onCleared: {
             root.visible = false;
         }
     }
 
-    // Current Uptime
-    Process {
-        id: uptimeProcess
-
-        command: ["sh", "-c", "cat /proc/uptime"]
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                var seconds = Math.floor(parseFloat(text.trim().split(" ")[0]));
-
-                var days = Math.floor(seconds / 86400);
-                seconds %= 86400;
-
-                var hours = Math.floor(seconds / 3600);
-                seconds %= 3600;
-
-                var minutes = Math.floor(seconds / 60);
-
-                root.uptime = days > 0 ? days + "D " + hours + "H " + minutes + "M" : hours + "H " + minutes + "M";
-            }
-        }
-    }
-
-    Timer {
-        interval: 60000
-        running: root.visible
-        repeat: true
-
-        onTriggered: uptimeProcess.running = true
-    }
-
-    anchors {
-        right: true
-        top: true
-    }
-
-    property int menuOffset: 30
-
-    margins {
-        top: menuOffset
-        right: 10
-    }
-
-    implicitWidth: 620
-    implicitHeight: 720
-
+    implicitWidth: 560
+    implicitHeight: 640
     color: "transparent"
+
+    property int selectedIndex: 0
+    property string mathResult: ""
 
     property string accent: "#d0d0d0"
     property string bg: "#0e0e0e"
@@ -78,7 +55,6 @@ PanelWindow {
 
     function toggle() {
         visible = !visible;
-
         if (visible) {
             search.text = "";
             search.forceActiveFocus();
@@ -91,431 +67,206 @@ PanelWindow {
         visible = false;
     }
 
-    function isPinned(app) {
-        return pinnedNames.indexOf(app.name) !== -1;
+    function evalMath(expr) {
+        // Whitelist: only digits, operators, parens, decimal, spaces
+        if (!/^[0-9+\-*/^().%\s]+$/.test(expr))
+            return null;
+        if (!/[0-9]/.test(expr))
+            return null;
+        var jsExpr = expr.replace(/\^/g, "**");
+        try {
+            var result = Function("return " + jsExpr)();
+            if (typeof result === "number" && isFinite(result))
+                return String(result);
+        } catch (e) {}
+        return null;
     }
 
-    function togglePin(app) {
-        console.log('app: ' + app);
-        var pins = pinnedNames.slice();
-        var index = pins.indexOf(app.name);
-
-        if (index === -1)
-            pins.push(app.name);
-        else
-            pins.splice(index, 1);
-
-        pinnedNames = pins;
-
-        pinFile.setText(JSON.stringify(pins, null, 2));
+    // ── App Model ──
+    AppModel {
+        id: appModel
+        filter: search.text
     }
 
+    // ── Uptime ──
+    Process {
+        id: uptimeProcess
+        command: ["uptime", "-p"]
+        running: false
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.uptime = text.trim();
+            }
+        }
+    }
+
+    // ── Layout ──
     Rectangle {
         anchors.fill: parent
-        z: 1
-
         color: root.bg
         border.color: root.border
         border.width: 1
 
-        // Subtle TUI grid
-        Repeater {
-            model: Math.floor(width / 40)
-
-            Rectangle {
-                x: index * 40
-                y: 0
-                width: 1
-                height: parent.height
-                color: root.border
-                opacity: 0.12
-            }
-        }
-
-        Repeater {
-            model: Math.floor(height / 40)
-
-            Rectangle {
-                x: 0
-                y: index * 40
-                width: parent.width
-                height: 1
-                color: root.border
-                opacity: 0.12
-            }
-        }
-
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 24
-            spacing: 14
-
-            // Header
-            RowLayout {
-                Layout.fillWidth: true
-
-                Text {
-                    text: "SYSTEM // START"
-                    color: root.accent
-                    font.family: "monospace"
-                    font.pixelSize: 18
-                    font.bold: true
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
-
-                ColumnLayout {
-                    spacing: 1
-                    Layout.alignment: Qt.AlignRight
-
-                    Text {
-                        text: "● ONLINE"
-                        color: root.accent
-                        font.family: "monospace"
-                        font.pixelSize: 11
-                    }
-
-                    Text {
-                        text: "UP " + root.uptime
-                        color: root.muted
-                        font.family: "monospace"
-                        font.pixelSize: 10
-                    }
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: 1
-                color: root.border
-            }
+            anchors.margins: 16
+            spacing: 12
 
             // Search
-            Rectangle {
+            TextField {
+                id: search
                 Layout.fillWidth: true
-                height: 48
+                Layout.preferredHeight: 36
+                placeholderText: "Search applications..."
+                color: root.text
+                font.family: "JetBrainsMono Nerd Font"
+                font.pixelSize: 12
+                background: Rectangle {
+                    color: root.bg2
+                    border.color: search.activeFocus ? root.accent : root.border
+                    border.width: 1
+                }
 
-                color: root.bg2
-                border.color: search.activeFocus ? root.accent : root.border
-                border.width: 1
-
-                RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 14
-                    anchors.rightMargin: 14
-
-                    Text {
-                        text: ">"
-                        color: root.accent
-                        font.family: "monospace"
-                        font.pixelSize: 18
-                        font.bold: true
+                onTextChanged: {
+                    root.selectedIndex = 0;
+                    var result = root.evalMath(text);
+                    if (result !== null) {
+                        root.mathResult = result;
+                    } else {
+                        root.mathResult = "";
                     }
+                }
 
-                    TextField {
-                        id: search
-
-                        Layout.fillWidth: true
-
-                        placeholderText: "SEARCH APPLICATIONS..."
-                        placeholderTextColor: root.muted
-
-                        color: root.text
-                        font.family: "monospace"
-                        font.pixelSize: 14
-
-                        background: null
-
-                        selectByMouse: true
-
-                        Keys.onEscapePressed: {
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Escape) {
+                        root.visible = false;
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Down) {
+                        root.selectedIndex = Math.min(root.selectedIndex + 1, appModel.listModel.count - 1);
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Up) {
+                        root.selectedIndex = Math.max(root.selectedIndex - 1, 0);
+                        event.accepted = true;
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        if (root.mathResult !== "") {
+                            Quickshell.execDetached(["wl-copy", root.mathResult]);
+                            root.visible = false;
+                        } else if (root.selectedIndex < appModel.listModel.count) {
+                            var item = appModel.listModel.get(root.selectedIndex);
+                            var id = item.desktopId.replace(/\.desktop$/, "");
+                            Quickshell.execDetached(["gtk-launch", id]);
                             root.visible = false;
                         }
 
-                        Keys.onReturnPressed: {
-                            if (filteredApps.length > 0)
-                                root.launch(filteredApps[0].command);
-                        }
+                        event.accepted = true;
                     }
+                }
 
-                    Text {
-                        text: "ESC"
-                        color: root.muted
-                        font.family: "monospace"
-                        font.pixelSize: 10
+                onAccepted: {
+                    if (root.mathResult !== "") {
+                        Quickshell.execDetached(["wl-copy", root.mathResult]);
+                        root.visible = false;
+                        return;
+                    }
+                    if (root.selectedIndex < appModel.listModel.count) {
+                        var item = appModel.listModel.get(root.selectedIndex);
+                        var id = item.desktopId.replace(/\.desktop$/, "");
+                        Quickshell.execDetached(["gtk-launch", id]);
+                        root.visible = false;
                     }
                 }
             }
 
-            // Pinned
+            // Math result
             Text {
-                text: "// PINNED"
+                Layout.fillWidth: true
+                Layout.preferredHeight: root.mathResult ? 28 : 0
+                visible: root.mathResult !== ""
+                text: "= " + root.mathResult
                 color: root.accent
-                font.family: "monospace"
-                font.pixelSize: 11
+                font.family: "JetBrainsMono Nerd Font"
+                font.pixelSize: 14
                 font.bold: true
             }
 
-            GridLayout {
-                Layout.fillWidth: true
+            // App List
+            ListView {
+                id: appGrid
 
-                columns: 3
-                rowSpacing: 8
-                columnSpacing: 8
-
-                Repeater {
-                    model: pinnedApps
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 72
-
-                        property bool hovered: mouse.containsMouse || pinMouse.containsMouse
-
-                        color: hovered ? "#1c1c1c" : root.bg2
-                        border.color: hovered ? root.accent : root.border
-                        border.width: 1
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.margins: 12
-                            spacing: 10
-
-                            Image {
-                                source: Quickshell.iconPath(modelData.icon)
-
-                                Layout.preferredWidth: 18
-                                Layout.preferredHeight: 18
-                                Layout.minimumWidth: 18
-                                Layout.minimumHeight: 18
-                                Layout.maximumWidth: 18
-                                Layout.maximumHeight: 18
-
-                                fillMode: Image.PreserveAspectFit
-                            }
-
-                            ColumnLayout {
-                                spacing: 2
-
-                                Text {
-                                    text: modelData.name
-                                    color: root.text
-                                    font.family: "monospace"
-                                    font.pixelSize: 12
-                                }
-                            }
-                        }
-
-                        Text {
-                            id: pinButton
-
-                            anchors.right: parent.right
-                            anchors.rightMargin: 12
-                            anchors.verticalCenter: parent.verticalCenter
-
-                            text: "★"
-                            color: root.accent
-
-                            opacity: parent.hovered ? 1.0 : 0.0
-
-                            font.family: "monospace"
-                            font.pixelSize: 17
-
-                            width: 44
-                            height: 44
-
-                            horizontalAlignment: Text.AlignHCenter
-                            verticalAlignment: Text.AlignVCenter
-
-                            MouseArea {
-                                id: pinMouse
-
-                                anchors.fill: parent
-
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-
-                                onClicked: {
-                                    console.log("Unpinning: " + modelData.name);
-                                    togglePin(modelData);
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            id: mouse
-
-                            anchors.left: parent.left
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            anchors.right: parent.right
-                            anchors.rightMargin: 44
-
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-
-                            onClicked: {
-                                root.launch(modelData.command);
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                height: 1
-                color: root.border
-            }
-
-            // Applications
-            Text {
-                text: "// APPLICATIONS"
-                color: root.accent
-                font.family: "monospace"
-                font.pixelSize: 11
-                font.bold: true
-            }
-
-            // Application list
-            ScrollView {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
                 clip: true
+                spacing: 4
+                boundsBehavior: Flickable.StopAtBounds
 
-                ScrollBar.vertical.policy: ScrollBar.AsNeeded
+                model: appModel.listModel
 
-                ColumnLayout {
-                    width: parent.width
-                    spacing: 2
+                delegate: Rectangle {
+                    width: appGrid.width
+                    height: 48
 
-                    Repeater {
-                        model: filteredApps
+                    property bool hovered: appMouse.containsMouse
 
-                        Rectangle {
+                    color: (index === root.selectedIndex) || hovered ? "#1c1c1c" : "transparent"
+                    border.color: (index === root.selectedIndex) || hovered ? root.accent : "transparent"
+                    border.width: 1
+                    radius: 3
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        spacing: 12
+
+                        Image {
+                            Layout.preferredWidth: 32
+                            Layout.preferredHeight: 32
+
+                            source: icon.length > 0 ? (icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, "application-x-executable")) : Quickshell.iconPath("application-x-executable")
+
+                            fillMode: Image.PreserveAspectFit
+                            sourceSize.width: 48
+                            sourceSize.height: 48
+                            asynchronous: true
+                            smooth: true
+                        }
+
+                        Text {
                             Layout.fillWidth: true
-                            height: 38
 
-                            property bool rowHovered: appMouse.containsMouse || pinMouse.containsMouse
+                            text: name
+                            color: hovered ? root.accent : root.text
+                            font.family: "JetBrainsMono Nerd Font"
+                            font.pixelSize: 11
+                            elide: Text.ElideRight
+                            verticalAlignment: Text.AlignVCenter
+                        }
+                    }
 
-                            color: rowHovered ? "#1c1c1c" : "transparent"
-                            border.color: rowHovered ? root.accent : "transparent"
-                            border.width: 1
+                    MouseArea {
+                        id: appMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
 
-                            RowLayout {
-                                anchors.fill: parent
-                                anchors.leftMargin: 10
-                                anchors.rightMargin: 10
-
-                                Text {
-                                    text: rowHovered ? ">" : " "
-                                    color: root.accent
-                                    font.family: "monospace"
-                                    font.pixelSize: 12
-                                    font.bold: true
-                                }
-
-                                Image {
-                                    source: Quickshell.iconPath(modelData.icon)
-
-                                    Layout.preferredWidth: 18
-                                    Layout.preferredHeight: 18
-                                    Layout.minimumWidth: 18
-                                    Layout.minimumHeight: 18
-                                    Layout.maximumWidth: 18
-                                    Layout.maximumHeight: 18
-
-                                    fillMode: Image.PreserveAspectFit
-                                }
-
-                                Text {
-                                    Layout.leftMargin: 15
-
-                                    text: modelData.name
-                                    color: root.text
-                                    font.family: "monospace"
-                                    font.pixelSize: 12
-                                }
-
-                                Text {
-                                    text: ' - ' + modelData.icon
-                                    color: root.accent
-                                    font.family: "monospace"
-                                    font.pixelSize: 15
-                                }
-
-                                Item {
-                                    Layout.fillWidth: true
-                                }
-
-                                Text {
-                                    id: pinButton
-
-                                    text: isPinned(modelData) ? "★" : "☆"
-                                    color: isPinned(modelData) ? root.accent : root.muted
-
-                                    opacity: appMouse.containsMouse || pinMouse.containsMouse ? 1.0 : 0.0
-
-                                    font.family: "monospace"
-                                    font.pixelSize: 17
-
-                                    Layout.preferredWidth: 24
-                                    Layout.preferredHeight: 24
-
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignVCenter
-
-                                    MouseArea {
-                                        id: pinMouse
-
-                                        anchors.top: parent.top
-                                        anchors.bottom: parent.bottom
-                                        anchors.right: parent.right
-                                        width: 44
-
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-
-                                        onClicked: {
-                                            console.log('Pin button clicked for app: ' + modelData.name);
-                                            togglePin(modelData);
-                                        }
-                                    }
-                                }
-                            }
-
-                            MouseArea {
-                                id: appMouse
-
-                                anchors.left: parent.left
-                                anchors.top: parent.top
-                                anchors.bottom: parent.bottom
-                                anchors.right: parent.right
-                                anchors.rightMargin: 44
-
-                                hoverEnabled: true
-                                cursorShape: Qt.PointingHandCursor
-
-                                onClicked: {
-                                    modelData.execute();
-                                    root.visible = false;
-                                }
-                            }
+                        onClicked: {
+                            var id = desktopId.replace(/\.desktop$/, "");
+                            Quickshell.execDetached(["gtk-launch", id]);
+                            root.visible = false;
                         }
                     }
                 }
             }
 
+            // Divider
             Rectangle {
                 Layout.fillWidth: true
                 height: 1
                 color: root.border
             }
 
-            // Bottom controls
+            // Power row
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 6
@@ -523,114 +274,57 @@ PanelWindow {
                 Repeater {
                     model: [
                         {
-                            label: "[ LOCK ]",
-                            command: "loginctl lock-session"
+                            label: "Lock",
+                            cmd: "hyprctl dispatch lock"
                         },
                         {
-                            label: "[ LOGOUT ]",
-                            command: "hyprctl dispatch exit"
+                            label: "Suspend",
+                            cmd: "systemctl suspend"
                         },
                         {
-                            label: "[ RESTART ]",
-                            command: "systemctl reboot"
+                            label: "Reboot",
+                            cmd: "systemctl reboot"
                         },
                         {
-                            label: "[ POWER ]",
-                            command: "systemctl poweroff"
+                            label: "Power",
+                            cmd: "systemctl poweroff"
                         }
                     ]
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        height: 34
-
-                        color: powerMouse.containsMouse ? "#1c1c1c" : root.bg2
-
+                    delegate: Rectangle {
+                        Layout.preferredWidth: (root.width / 4) - 12
+                        Layout.preferredHeight: 28
+                        color: powerMouse.containsMouse ? "#1c1c1c" : "transparent"
                         border.color: powerMouse.containsMouse ? root.accent : root.border
-
                         border.width: 1
+                        radius: 2
 
                         Text {
                             anchors.centerIn: parent
-
                             text: modelData.label
-                            color: powerMouse.containsMouse ? root.accent : root.muted
-
-                            font.family: "monospace"
+                            color: root.text
+                            font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 9
-                            font.bold: true
                         }
 
                         MouseArea {
                             id: powerMouse
-
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-
-                            onClicked: root.launch(modelData.command)
+                            onClicked: root.launch(modelData.cmd)
                         }
                     }
                 }
             }
 
+            // Footer
             Text {
                 Layout.alignment: Qt.AlignRight
-
-                text: "QUICKSHELL // READY"
+                text: "QUICKSHELL // " + root.uptime
                 color: root.muted
-                font.family: "monospace"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 8
             }
         }
-    }
-
-    // ------------------------------------------------------------
-    // APPLICATION DATA
-    // ------------------------------------------------------------
-
-    property var pinnedNames: []
-
-    FileView {
-        id: pinFile
-
-        path: Quickshell.env("HOME") + "/.config/quickshell/startmenu-pins.json"
-
-        onLoaded: {
-            try {
-                console.log('Loading pin file...');
-                var saved = JSON.parse(text());
-
-                console.log('saved: ' + saved);
-
-                if (Array.isArray(saved))
-                    root.pinnedNames = saved;
-            } catch (e) {
-                console.log("StartMenu: Failed to parse pin file:", e);
-            }
-        }
-    }
-
-    property var pinnedApps: {
-        return applications.filter(function (app) {
-            return pinnedNames.indexOf(app.name) !== -1;
-        });
-    }
-
-    property var applications: DesktopEntries.applications.values
-
-    property var filteredApps: {
-        var q = search.text.toLowerCase().trim();
-
-        var sortedApps = applications.slice().sort(function (a, b) {
-            return a.name.localeCompare(b.name);
-        });
-
-        if (q === "")
-            return sortedApps;
-
-        return sortedApps.filter(function (app) {
-            return (app.name || "").toLowerCase().indexOf(q) !== -1 || (app.genericName || "").toLowerCase().indexOf(q) !== -1 || (app.categories || []).join(" ").toLowerCase().indexOf(q) !== -1;
-        });
     }
 }
