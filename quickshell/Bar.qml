@@ -206,6 +206,34 @@ Scope {
                     }
 
                     // Right
+                    AirPlay {
+                        id: airplayWidget
+
+                        anchors {
+                            right: networkWidget.left
+                            verticalCenter: parent.verticalCenter
+                            rightMargin: 10
+                        }
+                    }
+
+                    Audio {
+                        id: audioWidget
+
+                        anchors {
+                            right: airplayWidget.visible ? airplayWidget.left : networkWidget.left
+                            verticalCenter: parent.verticalCenter
+                            rightMargin: 10
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+
+                            onClicked: audioMenu.visible = !audioMenu.visible
+                        }
+                    }
+
                     Network {
                         id: networkWidget
 
@@ -225,6 +253,7 @@ Scope {
                         }
                     }
 
+                    // Popup Menus
                     NetworkMenu {
                         id: networkMenu
 
@@ -233,24 +262,6 @@ Scope {
                         onVisibleChanged: {
                             if (!visible)
                                 hideTimer.restart();
-                        }
-                    }
-
-                    Audio {
-                        id: audioWidget
-
-                        anchors {
-                            right: networkWidget.left
-                            verticalCenter: parent.verticalCenter
-                            rightMargin: 10
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-
-                            onClicked: audioMenu.visible = !audioMenu.visible
                         }
                     }
 

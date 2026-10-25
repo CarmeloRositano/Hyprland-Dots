@@ -200,6 +200,10 @@ PanelWindow {
                 spacing: 4
                 boundsBehavior: Flickable.StopAtBounds
 
+                // flickable.deceleration: 0.01
+                // flickable.velocityThreshold: 100
+                // flickable.dragThreshold: 5
+
                 model: appModel.listModel
 
                 delegate: Rectangle {
