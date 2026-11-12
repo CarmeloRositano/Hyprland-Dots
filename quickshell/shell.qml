@@ -1,6 +1,6 @@
 import Quickshell
 import Quickshell.Wayland
-import Quickshell.Services.Notifications  
+import Quickshell.Services.Notifications
 import QtQuick
 
 Scope {
@@ -17,7 +17,6 @@ Scope {
         color: "transparent"
         aboveWindows: true
         focusable: false
-        hoverable: false
 
         Repeater {
             model: notifications.trackedNotifications
@@ -39,9 +38,8 @@ Scope {
 
                 MouseArea {
                     anchors.fill: parent
-                    onEntered: started = false
-                    onExited: started = false
                 }
+
             }
         }
     }
