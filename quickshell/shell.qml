@@ -9,9 +9,7 @@ Scope {
     }
 
     PanelWindow {
-        anchors.right: parent.right
-        bottom: parent.bottom
-        margins { right: 10; top: 24 }
+        margins { right: 10 }
         width: 500
         height: 700
         color: "transparent"
@@ -33,7 +31,7 @@ Scope {
                     anchors.fill: parent
                     spacing: 7
                     Text { text: notification.summary || ""; color: "#ffffff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14; elide: Text.ElideRight; maximumLineCount: 1 }
-                    Text { text: notification.body || ""; color: "#bbbbcc"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; wrapMode: Text.WrapAtWordBoundaryOrAnywhere; maximumLineCount: 3 }
+                    Text { text: notification.body || ""; color: "#bbbbcc"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; wrapMode:Text.WrapAtWordBoundaryOrAnywhere; maximumLineCount: 3 }
                 }
 
                 MouseArea {
