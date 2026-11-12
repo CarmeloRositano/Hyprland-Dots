@@ -10,7 +10,7 @@ Scope {
 
     PanelWindow {
         anchors.right: parent.right
-        top: parent.top
+        bottom: parent.bottom
         margins { right: 10; top: 24 }
         width: 500
         height: 700
