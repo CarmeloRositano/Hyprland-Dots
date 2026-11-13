@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
+import Quickshell.Hyprland
 import QtQuick
 
 Scope {
@@ -10,6 +11,51 @@ Scope {
         onNotification: notification => {
             notification.tracked = true;
         }
+    }
+
+    // Find the application and activate its workspace.
+    function openNotificationWorkspace(notification) {
+        const appName = String(notification.appName || "").toLowerCase().trim().replace(/[^a-z0-9]/g, "");
+
+        if (!appName) {
+            console.warn("Notification has no app name");
+            return;
+        }
+
+        // Refresh then re-read the toplevel list. Note that refreshToplevels() must
+        // be called before lastIpcObject reflects live data; the live-synced toplevel
+        // object only exposes dedicated properties (title, address, workspace).
+        Hyprland.refreshToplevels();
+        const windows = Hyprland.toplevels.values;
+
+        for (const win of windows) {
+            if (!win || !win.title)
+                continue;
+
+            const ipc = win.lastIpcObject || {};
+            const initialTitle = win.initialTitle || "";
+
+            const labels = [
+                String(win.title).toLowerCase(),
+                String(initialTitle).toLowerCase(),
+                String(ipc.class || "").toLowerCase(),
+                String(ipc.initial_class || "").toLowerCase(),
+                String(ipc.stableId || "").toLowerCase(),
+            ].filter(s => s);
+
+            for (const label of labels) {
+                if (label === appName || label.includes(appName) || appName.includes(label)) {
+                    if (win.workspace)
+                        win.workspace.activate();
+
+                    const ws = win.workspace;
+                    console.log("Opening workspace", ws && ws.name, "for", notification.appName);
+                    return;
+                }
+            }
+        }
+
+        console.warn("Could not find workspace for notification from:", notification.appName);
     }
 
     PanelWindow {
@@ -55,7 +101,6 @@ Scope {
                     radius: 8
                     color: mouseArea.containsMouse ? "#202020" : "#0e0e0e"
 
-                    // Automatic timeout
                     Timer {
                         id: timeoutTimer
                         interval: 8000
@@ -93,9 +138,10 @@ Scope {
 
                     MouseArea {
                         id: mouseArea
-                        anchors.fill: parent
 
+                        anchors.fill: parent
                         hoverEnabled: true
+
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                         onEntered: {
