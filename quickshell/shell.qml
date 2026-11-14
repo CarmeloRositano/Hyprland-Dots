@@ -22,9 +22,6 @@ Scope {
             return;
         }
 
-        // Refresh then re-read the toplevel list. Note that refreshToplevels() must
-        // be called before lastIpcObject reflects live data; the live-synced toplevel
-        // object only exposes dedicated properties (title, address, workspace).
         Hyprland.refreshToplevels();
         const windows = Hyprland.toplevels.values;
 
@@ -113,32 +110,43 @@ Scope {
                     }
 
                     Column {
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        spacing: 7
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    spacing: 7
 
-                        Text {
-                            text: notification.summary || ""
-                            color: "#ffffff"
-                            font.family: "JetBrainsMono Nerd Font"
-                            font.pixelSize: 14
-                            elide: Text.ElideRight
-                            maximumLineCount: 1
-                        }
-
-                        Text {
-                            text: notification.body || ""
-                            color: "#bbbbcc"
-                            font.family: "JetBrainsMono Nerd Font"
-                            font.pixelSize: 12
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            maximumLineCount: 3
-                        }
+                    Image {
+                    id: notifyIcon
+                    source: notification.image || notification.appIcon
+                    visible: (notification.image || notification.appIcon) !== ""
+                    fillType: Image.PreserveAspectFit
+                    width: 28
+                    height: 28
+                    radius: 6
+                    clip: true
                     }
 
-                    MouseArea {
-                        id: mouseArea
+                    Text {
+                    anchors.leftEdge: parent.left
+                    text: notification.appName or ""
+                    color: "#ffffff"
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 13
+                    bold: true
+                    elide: Text.ElideRight
+                    maximumLineCount: 1
+                    }
 
+                    Text {
+                    anchors.leftEdge: parent.left
+                    text: notification.body || notification.summary or ""
+                    color: "#bbbbcc"
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 11
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    elide: Text.ElideRight
+                    maximumLineCount: 3
+                    }
+                    }
                         anchors.fill: parent
                         hoverEnabled: true
 
