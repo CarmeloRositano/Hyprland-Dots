@@ -22,6 +22,9 @@ Scope {
             return;
         }
 
+        // Refresh then re-read the toplevel list. Note that refreshToplevels() must
+        // be called before lastIpcObject reflects live data; the live-synced toplevel
+        // object only exposes dedicated properties (title, address, workspace).
         Hyprland.refreshToplevels();
         const windows = Hyprland.toplevels.values;
 
@@ -32,7 +35,13 @@ Scope {
             const ipc = win.lastIpcObject || {};
             const initialTitle = win.initialTitle || "";
 
-            const labels = [String(win.title).toLowerCase(), String(initialTitle).toLowerCase(), String(ipc.class || "").toLowerCase(), String(ipc.initial_class || "").toLowerCase(), String(ipc.stableId || "").toLowerCase(),].filter(s => s);
+            const labels = [
+                String(win.title).toLowerCase(),
+                String(initialTitle).toLowerCase(),
+                String(ipc.class || "").toLowerCase(),
+                String(ipc.initial_class || "").toLowerCase(),
+                String(ipc.stableId || "").toLowerCase(),
+            ].filter(s => s);
 
             for (const label of labels) {
                 if (label === appName || label.includes(appName) || appName.includes(label)) {
@@ -107,11 +116,6 @@ Scope {
                         anchors.fill: parent
                         anchors.margins: 10
                         spacing: 7
-                        Column {                            width: 24
-                            height: 24
-                            source: notification.appIcon
-                            visible: notification.appIcon !== ""
-                        }
 
                         Text {
                             text: notification.summary || ""
