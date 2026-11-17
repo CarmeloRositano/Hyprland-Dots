@@ -8,9 +8,27 @@ Scope {
     NotificationServer {
         id: notifications
 
+        // Notification previews are disabled. Application icons are still shown.
+        imageSupported: false
+        bodyImagesSupported: false
+        bodyMarkupSupported: true
+
         onNotification: notification => {
             notification.tracked = true;
         }
+    }
+
+    // Resolve the application's icon (not notification image attachments).
+    function notificationIconSource(notification) {
+        const icon = notification.appIcon || "";
+
+        if (icon === "")
+            return Quickshell.iconPath("application-x-executable");
+
+        if (icon.startsWith("/") || icon.startsWith("file:") || icon.includes("://"))
+            return icon;
+
+        return Quickshell.iconPath(icon, "application-x-executable");
     }
 
     // Find the application and activate its workspace.
@@ -31,22 +49,16 @@ Scope {
 
             const ipc = win.lastIpcObject || {};
             const initialTitle = win.initialTitle || "";
-
-            const labels = [
-                String(win.title).toLowerCase(),
-                String(initialTitle).toLowerCase(),
-                String(ipc.class || "").toLowerCase(),
-                String(ipc.initial_class || "").toLowerCase(),
-                String(ipc.stableId || "").toLowerCase(),
-            ].filter(s => s);
+            const labels = [String(win.title).toLowerCase(), String(initialTitle).toLowerCase(), String(ipc.class || "").toLowerCase(), String(ipc.initial_class || "").toLowerCase(), String(ipc.stableId || "").toLowerCase()].filter(s => s);
 
             for (const label of labels) {
-                if (label === appName || label.includes(appName) || appName.includes(label)) {
+                const normalized = label.replace(/[^a-z0-9]/g, "");
+
+                if (normalized === appName || normalized.includes(appName) || appName.includes(normalized)) {
                     if (win.workspace)
                         win.workspace.activate();
 
-                    const ws = win.workspace;
-                    console.log("Opening workspace", ws && ws.name, "for", notification.appName);
+                    console.log("Opening workspace", win.workspace && win.workspace.name, "for", notification.appName);
                     return;
                 }
             }
@@ -69,7 +81,7 @@ Scope {
         }
 
         width: 500
-        height: 700
+        implicitHeight: notificationContainer.implicitHeight
 
         color: "transparent"
         aboveWindows: true
@@ -83,73 +95,115 @@ Scope {
             id: notificationContainer
 
             width: parent.width
-            height: childrenRect.height
             spacing: 10
+            height: childrenRect.height
 
             Repeater {
                 model: notifications.trackedNotifications
 
                 delegate: Rectangle {
+                    id: notificationCard
+
                     property Notification notification: modelData
 
                     width: notificationContainer.width
-                    height: 120
+                    height: cardContent.implicitHeight + 24
 
                     radius: 8
                     color: mouseArea.containsMouse ? "#202020" : "#0e0e0e"
 
+                    // Automatic dismissal.
                     Timer {
                         id: timeoutTimer
+
                         interval: 8000
                         repeat: false
                         running: true
 
-                        onTriggered: {
-                            notification.expire();
+                        onTriggered: notification.expire()
+                    }
+
+                    // Notification content.
+                    Column {
+                        id: cardContent
+
+                        width: parent.width - 24
+                        x: 12
+                        y: 12
+                        spacing: 10
+
+                        Row {
+                            id: headerRow
+
+                            width: parent.width
+                            height: Math.max(64, textColumn.implicitHeight)
+                            spacing: 12
+
+                            // Application icon.
+                            Rectangle {
+                                width: 64
+                                height: 64
+                                radius: 8
+                                color: "transparent"
+                                clip: true
+
+                                Image {
+                                    anchors.fill: parent
+                                    anchors.margins: 3
+
+                                    source: notificationIconSource(notification)
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
+                                    asynchronous: true
+                                }
+                            }
+
+                            // Notification text.
+                            Column {
+                                id: textColumn
+
+                                width: parent.width - 76
+                                spacing: 5
+
+                                Text {
+                                    width: parent.width
+                                    text: notification.appName || notification.desktopEntry || "Notification"
+                                    color: "#999999"
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 11
+                                    font.bold: true
+                                    elide: Text.ElideRight
+                                    maximumLineCount: 1
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: notification.summary || notification.body || "Notification"
+                                    color: "#ffffff"
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 13
+                                    font.bold: true
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                }
+
+                                Text {
+                                    width: parent.width
+                                    text: notification.summary ? (notification.body || "") : ""
+                                    color: "#bbbbbb"
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 11
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                }
+                            }
                         }
                     }
 
-                    Column {
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 7
+                    // Mouse interaction.
+                    MouseArea {
+                        id: mouseArea
 
-                    Image {
-                    id: notifyIcon
-                    source: notification.image || notification.appIcon
-                    visible: (notification.image || notification.appIcon) !== ""
-                    fillType: Image.PreserveAspectFit
-                    width: 28
-                    height: 28
-                    radius: 6
-                    clip: true
-                    }
-
-                    Text {
-                    anchors.leftEdge: parent.left
-                    text: notification.appName or ""
-                    color: "#ffffff"
-                    font.family: "JetBrainsMono Nerd Font"
-                    font.pixelSize: 13
-                    bold: true
-                    elide: Text.ElideRight
-                    maximumLineCount: 1
-                    }
-
-                    Text {
-                    anchors.leftEdge: parent.left
-                    text: notification.body || notification.summary or ""
-                    color: "#bbbbcc"
-                    font.family: "JetBrainsMono Nerd Font"
-                    font.pixelSize: 11
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    elide: Text.ElideRight
-                    maximumLineCount: 3
-                    }
-                    }
                         anchors.fill: parent
                         hoverEnabled: true
-
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                         onEntered: {
@@ -158,7 +212,10 @@ Scope {
                         }
 
                         onClicked: mouse => {
-                            if (mouse.button === Qt.LeftButton || mouse.button === Qt.RightButton) {
+                            if (mouse.button === Qt.LeftButton) {
+                                openNotificationWorkspace(notification);
+                                notification.dismiss();
+                            } else if (mouse.button === Qt.RightButton) {
                                 notification.dismiss();
                             }
                         }
