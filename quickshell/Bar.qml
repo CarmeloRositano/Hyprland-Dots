@@ -39,24 +39,18 @@ Scope {
                 }
             }
 
-            // Check if the top 1px is hovered if so open the bar on exist close the bar
-            MouseArea {
-                anchors {
-                    top: parent.top
-                    horizontalCenter: parent.horizontalCenter
-                }
-                width: parent.width
-                height: 1
-                hoverEnabled: true
+            // Detect hovering over the top edge without blocking mouse input
+            HoverHandler {
+                id: edgeHover
 
-                onEntered: {
-                    barWindow.barVisible = true;
-                    barWindow.expand = true;
-                    hideTimer.stop();
-                }
-
-                onExited: {
-                    hideTimer.restart();
+                onHoveredChanged: {
+                    if (hovered) {
+                        barWindow.barVisible = true;
+                        barWindow.expand = true;
+                        hideTimer.stop();
+                    } else {
+                        hideTimer.restart();
+                    }
                 }
             }
 
@@ -67,7 +61,7 @@ Scope {
                 repeat: false
 
                 onTriggered: {
-                    if (!barHover.hovered && !startMenu.visible && !networkMenu.visible && !audioMenu.visible) {
+                    if (!barHover.hovered && !edgeHover.hovered && !startMenu.visible && !networkMenu.visible && !audioMenu.visible && !calendarMenu.visible) {
                         barWindow.expand = false;
                     }
                 }
@@ -203,39 +197,19 @@ Scope {
                     // Middle
                     ClockWidget {
                         anchors.centerIn: parent
-                    }
-
-                    // Right
-                    AirPlay {
-                        id: airplayWidget
-
-                        anchors {
-                            right: networkWidget.left
-                            verticalCenter: parent.verticalCenter
-                            rightMargin: 10
-                        }
-                    }
-
-                    Audio {
-                        id: audioWidget
-
-                        anchors {
-                            right: airplayWidget.visible ? airplayWidget.left : networkWidget.left
-                            verticalCenter: parent.verticalCenter
-                            rightMargin: 10
-                        }
 
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
 
-                            onClicked: audioMenu.visible = !audioMenu.visible
+                            onClicked: calendarMenu.toggle()
                         }
                     }
 
-                    Network {
-                        id: networkWidget
+                    // Right
+                    Row {
+                        id: systemTray
 
                         anchors {
                             right: parent.right
@@ -243,13 +217,71 @@ Scope {
                             rightMargin: 10
                         }
 
-                        MouseArea {
-                            id: networkMouse
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
+                        spacing: 10
 
-                            onClicked: networkMenu.toggle()
+                        AirPlay {
+                            id: airplayWidget
+                        }
+
+                        Text {
+                            text: airplayWidget.visible ? "│" : ""
+                            color: "#ffffff"
+                            font.pixelSize: 12
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Audio {
+                            id: audioWidget
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+
+                                onClicked: audioMenu.visible = !audioMenu.visible
+                            }
+                        }
+
+                        Text {
+                            text: "│"
+                            color: "#ffffff"
+                            font.pixelSize: 12
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Network {
+                            id: networkWidget
+
+                            MouseArea {
+                                id: networkMouse
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+
+                                onClicked: networkMenu.toggle()
+                            }
+                        }
+
+                        Text {
+                            text: "│"
+                            color: "#ffffff"
+                            font.pixelSize: 12
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+
+                        Text {
+                            id: startMenuIcon
+                            text: "≡"
+                            color: "#ffffff"
+                            font.pixelSize: 12
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+
+                                onClicked: startMenu.toggle()
+                            }
                         }
                     }
 
@@ -276,6 +308,17 @@ Scope {
 
                     StartMenu {
                         id: startMenu
+
+                        onVisibleChanged: {
+                            if (!visible)
+                                hideTimer.restart();
+                        }
+                    }
+
+                    Calendar {
+                        id: calendarMenu
+
+                        parentPanel: barWindow
 
                         onVisibleChanged: {
                             if (!visible)

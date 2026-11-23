@@ -3,18 +3,22 @@ import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import Quickshell.Hyprland
 import QtQuick
+import "."
 
 Scope {
     NotificationServer {
         id: notifications
 
-        // Notification previews are disabled. Application icons are still shown.
         imageSupported: false
         bodyImagesSupported: false
         bodyMarkupSupported: true
 
         onNotification: notification => {
+            console.log("NOTIFICATION RECEIVED:", notification.appName, "|", notification.summary, "|", notification.body);
+
             notification.tracked = true;
+
+            console.log("Notification tracked:", notification.tracked);
         }
     }
 
@@ -80,8 +84,24 @@ Scope {
             top: 24
         }
 
-        width: 500
-        implicitHeight: notificationContainer.implicitHeight
+        // Pin to the main monitor (falls back to the first connected screen if
+        // DP-3 is missing) so reloads/focus changes can't move the window around.
+        readonly property ShellScreen targetScreen: {
+            for (const scr of Quickshell.screens) {
+                if (scr.name === "DP-3")
+                    return scr;
+            }
+            return Quickshell.screens.length > 0 ? Quickshell.screens[0] : null;
+        }
+
+        screen: targetScreen
+
+        implicitWidth: 500
+        // Keep the surface non-zero even when empty, otherwise the compositor
+        // closes the layer surface during a lock/DPMS cycle and it never re-maps
+        // (mirrors the bar's barMin:1 trick, which is why the bar survives locks).
+        readonly property int minNotificationHeight: 1
+        implicitHeight: Math.max(minNotificationHeight, notificationContainer.implicitHeight)
 
         color: "transparent"
         aboveWindows: true

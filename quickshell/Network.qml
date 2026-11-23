@@ -6,7 +6,7 @@ import QtQuick
 Item {
     id: root
 
-    implicitWidth: 260
+    implicitWidth: 270
     implicitHeight: networkText.implicitHeight
 
     readonly property var devices: Networking.devices.values
@@ -20,11 +20,11 @@ Item {
     readonly property bool wiredConnected: ethernetState === "1"
 
     // Network speed
-    property real rxMbps: 0
-    property real txMbps: 0
+    property real download: 0
+    property real upload: 0
 
-    property double lastRxBytes: 0
-    property double lastTxBytes: 0
+    property double lastDownload: 0
+    property double lastUpload: 0
     property double lastSampleTime: 0
 
     readonly property string networkInterface: {
@@ -38,13 +38,7 @@ Item {
     }
 
     function formatSpeed(mbps) {
-        if (mbps >= 1000)
-            return (mbps / 1000).toFixed(2).padStart(7, ".") + "G";
-
-        if (mbps >= 1)
-            return mbps.toFixed(2).padStart(7, ".") + "M";
-
-        return (mbps * 1000).toFixed(1).padStart(7, ".") + "K";
+        return mbps.toFixed(2).padStart(7, " ") + "Mbps";
     }
 
     function wifiIcon(strength) {
@@ -95,22 +89,22 @@ Item {
                 if (values.length < 2)
                     return;
 
-                var rx = parseInt(values[0]);
-                var tx = parseInt(values[1]);
+                var download = parseInt(values[0]);
+                var upload = parseInt(values[1]);
                 var now = Date.now();
 
                 if (root.lastSampleTime > 0) {
                     var seconds = (now - root.lastSampleTime) / 1000;
 
                     if (seconds > 0) {
-                        root.rxMbps = ((rx - root.lastRxBytes) * 8) / seconds / 1000000;
+                        root.download = ((download - root.lastDownload) * 8) / seconds / 1000000;
 
-                        root.txMbps = ((tx - root.lastTxBytes) * 8) / seconds / 1000000;
+                        root.upload = ((upload - root.lastUpload) * 8) / seconds / 1000000;
                     }
                 }
 
-                root.lastRxBytes = rx;
-                root.lastTxBytes = tx;
+                root.lastDownload = download;
+                root.lastUpload = upload;
                 root.lastSampleTime = now;
             }
         }
@@ -151,8 +145,7 @@ Item {
         color: "#ffffff"
 
         text: {
-            var icon = root.wiredConnected ? "󰈀" : root.wifiConnected ? root.wifiIcon(root.wifiStrength) : "󰤭";
-            return "NET::" + icon + (root.wifiConnected ? " [" + root.wifiStrength + "%]" : "") + "  RX::[" + root.formatSpeed(root.rxMbps) + "]" + " TX::[" + root.formatSpeed(root.txMbps) + "]";
+            return "UP/DWN::[ " + root.formatSpeed(root.upload) + " | " + root.formatSpeed(root.download) + " ]";
         }
     }
 }
