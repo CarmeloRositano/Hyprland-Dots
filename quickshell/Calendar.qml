@@ -1,7 +1,6 @@
 import Quickshell
 import Quickshell.Hyprland
 import QtQuick
-import QtQuick.Controls
 import QtQuick.Layouts
 
 PopupWindow {
@@ -15,8 +14,8 @@ PopupWindow {
     anchor.rect.x: parentPanel ? (parentPanel.width - width) / 2 : 0
     anchor.rect.y: parentPanel ? parentPanel.height + 5 : 0
 
-    implicitWidth: 340
-    implicitHeight: 390
+    implicitWidth: 420
+    implicitHeight: 520
     visible: false
     color: "transparent"
 
@@ -50,6 +49,15 @@ PopupWindow {
         return new Date(displayedMonth.getFullYear(), displayedMonth.getMonth(), index - offset + 1);
     }
 
+    Shortcut {
+        sequence: "Escape"
+        context: Qt.WindowShortcut
+
+        onActivated: {
+            root.visible = false;
+        }
+    }
+
     Timer {
         id: grabDelay
         interval: 80
@@ -74,63 +82,120 @@ PopupWindow {
 
     Rectangle {
         anchors.fill: parent
-        radius: 12
+
         color: Colors.bg
         border.color: Colors.border
         border.width: 1
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 14
+            anchors.margins: 16
             spacing: 12
+
+            // Header
+            RowLayout {
+                Layout.fillWidth: true
+
+                Text {
+                    text: "CALENDAR // DATE"
+                    color: Colors.accent
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 16
+                    font.bold: true
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                Text {
+                    text: "×"
+                    color: Colors.muted
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 18
+
+                    MouseArea {
+                        anchors.fill: parent
+                        anchors.margins: -8
+                        cursorShape: Qt.PointingHandCursor
+
+                        onClicked: root.visible = false
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: Colors.border
+            }
 
             // Month navigation
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 8
 
-                ToolButton {
-                    text: "‹"
-                    onClicked: root.changeMonth(-1)
+                Rectangle {
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 28
 
-                    contentItem: Text {
-                        text: parent.text
-                        color: Colors.text
-                        font.pixelSize: 24
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                    color: prevMouse.containsMouse ? "#1c1c1c" : "transparent"
+                    border.color: prevMouse.containsMouse ? Colors.accent : Colors.border
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "‹"
+                        color: prevMouse.containsMouse ? Colors.accent : Colors.text
+                        font.family: "JetBrainsMono Nerd Font"
+                        font.pixelSize: 14
+                        font.bold: true
                     }
 
-                    background: Rectangle {
-                        color: parent.hovered ? Colors.bg2 : "transparent"
-                        radius: 6
+                    MouseArea {
+                        id: prevMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+
+                        onClicked: root.changeMonth(-1)
                     }
                 }
 
                 Text {
                     Layout.fillWidth: true
-                    text: Qt.formatDate(root.displayedMonth, "MMMM yyyy")
+                    text: Qt.formatDate(root.displayedMonth, "MMMM yyyy").toUpperCase()
                     color: Colors.text
-                    font.pixelSize: 17
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 14
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                 }
 
-                ToolButton {
-                    text: "›"
-                    onClicked: root.changeMonth(1)
+                Rectangle {
+                    Layout.preferredWidth: 28
+                    Layout.preferredHeight: 28
 
-                    contentItem: Text {
-                        text: parent.text
-                        color: Colors.text
-                        font.pixelSize: 24
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+                    color: nextMouse.containsMouse ? "#1c1c1c" : "transparent"
+                    border.color: nextMouse.containsMouse ? Colors.accent : Colors.border
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "›"
+                        color: nextMouse.containsMouse ? Colors.accent : Colors.text
+                        font.family: "JetBrainsMono Nerd Font"
+                        font.pixelSize: 14
+                        font.bold: true
                     }
 
-                    background: Rectangle {
-                        color: parent.hovered ? Colors.bg2 : "transparent"
-                        radius: 6
+                    MouseArea {
+                        id: nextMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+
+                        onClicked: root.changeMonth(1)
                     }
                 }
             }
@@ -143,14 +208,15 @@ PopupWindow {
                 columnSpacing: 2
 
                 Repeater {
-                    model: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+                    model: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
 
                     Text {
                         required property string modelData
                         Layout.fillWidth: true
                         text: modelData
                         color: Colors.muted
-                        font.pixelSize: 11
+                        font.family: "JetBrainsMono Nerd Font"
+                        font.pixelSize: 10
                         horizontalAlignment: Text.AlignHCenter
                     }
                 }
@@ -161,7 +227,7 @@ PopupWindow {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 columns: 7
-                rowSpacing: 4
+                rowSpacing: 2
                 columnSpacing: 2
 
                 Repeater {
@@ -177,14 +243,17 @@ PopupWindow {
                         readonly property bool inMonth: day.getMonth() === root.displayedMonth.getMonth()
                         readonly property bool selected: root.isSelected(day)
                         readonly property bool today: root.isToday(day)
+                        readonly property bool hovered: dayMouse.containsMouse
 
-                        radius: 6
-                        color: selected ? Colors.selected : today ? Colors.bg3 : dayMouse.containsMouse ? Colors.bg2 : "transparent"
+                        color: selected || hovered ? "#1c1c1c" : today ? "#191919" : "transparent"
+                        border.width: 1
+                        border.color: selected || hovered ? Colors.accent : today ? Colors.border : "transparent"
 
                         Text {
                             anchors.centerIn: parent
                             text: parent.day.getDate()
-                            color: parent.selected ? "#111111" : parent.inMonth ? Colors.text : Colors.muted
+                            color: parent.selected ? Colors.accent : parent.inMonth ? Colors.text : Colors.muted
+                            font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 13
                             font.bold: parent.selected || parent.today
                         }
@@ -193,6 +262,7 @@ PopupWindow {
                             id: dayMouse
                             anchors.fill: parent
                             hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
 
                             onClicked: {
                                 root.selectedDate = parent.day;
@@ -205,35 +275,58 @@ PopupWindow {
                 }
             }
 
+            Rectangle {
+                Layout.fillWidth: true
+                height: 1
+                color: Colors.border
+            }
+
             // Footer
             RowLayout {
                 Layout.fillWidth: true
 
                 Text {
                     Layout.fillWidth: true
-                    text: Qt.formatDate(root.selectedDate, "dddd, d MMMM yyyy")
+                    text: "SELECTED // " + Qt.formatDate(root.selectedDate, "d MMM yyyy").toUpperCase()
                     color: Colors.muted
-                    font.pixelSize: 11
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 10
                 }
 
-                Button {
-                    text: "Today"
-                    onClicked: {
-                        root.selectedDate = new Date();
-                        root.displayedMonth = new Date();
+                Text {
+                    text: "[ ESC ] CLOSE"
+                    color: Colors.muted
+                    font.family: "JetBrainsMono Nerd Font"
+                    font.pixelSize: 9
+                }
+
+                Rectangle {
+                    Layout.preferredWidth: 60
+                    Layout.preferredHeight: 26
+
+                    color: todayMouse.containsMouse ? "#1c1c1c" : "transparent"
+                    border.color: todayMouse.containsMouse ? Colors.accent : Colors.border
+                    border.width: 1
+
+                    Text {
+                        anchors.centerIn: parent
+                        text: "TODAY"
+                        color: todayMouse.containsMouse ? Colors.accent : Colors.text
+                        font.family: "JetBrainsMono Nerd Font"
+                        font.pixelSize: 10
+                        font.bold: true
                     }
 
-                    contentItem: Text {
-                        text: parent.text
-                        color: Colors.selected
-                        font.pixelSize: 12
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    MouseArea {
+                        id: todayMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
 
-                    background: Rectangle {
-                        color: parent.hovered ? Colors.bg2 : "transparent"
-                        radius: 5
+                        onClicked: {
+                            root.selectedDate = new Date();
+                            root.displayedMonth = new Date();
+                        }
                     }
                 }
             }
